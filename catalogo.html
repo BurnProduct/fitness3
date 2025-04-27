@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Catálogo de Produtos</title>
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.1/css/all.min.css" />
+  <!-- Fonte Lora -->
+  <link href="https://fonts.googleapis.com/css2?family=Lora&display=swap" rel="stylesheet">
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'Lora', serif; background:#fff; color:#111; padding:20px; }
+    h1 { text-align:center; margin-bottom:30px; font-size:2em; }
+    #floatingSacola { position:fixed; top:20px; right:20px; background:#007BFF; color:#fff; border:none; border-radius:8px; padding:10px 15px; display:flex; align-items:center; gap:8px; cursor:pointer; box-shadow:0 2px 4px rgba(0,0,0,0.3); transition:background 0.3s; }
+    #floatingSacola:hover { background:#0056b3; }
+    .family-section { margin-bottom:40px; }
+    .family-title { font-size:1.5em; font-weight:bold; margin-bottom:15px; }
+    .family-layout { display:flex; flex-wrap:wrap; gap:20px; align-items:flex-start; }
+    .family-image img { width:200px; height:200px; object-fit:cover; border-radius:8px; }
+    .family-list table { border-collapse:collapse; width:100%; max-width:600px; }
+    .family-list th, .family-list td { border:1px solid #ccc; padding:8px; text-align:center; }
+    .family-list th { background:#f0f0f0; }
+    .family-list input { width:60px; padding:4px; }
+    .add-to-cart { background:#fff; border:1px solid #ccc; border-radius:50%; width:30px; height:30px; display:inline-flex; align-items:center; justify-content:center; cursor:pointer; transition:background 0.3s; }
+    .add-to-cart:hover { background:#ddd; }
+    .add-to-cart.added { background:green; }
+    .add-to-cart.added i { color:#fff; }
+  </style>
+</head>
+<body>
+  <button id="floatingSacola" onclick="window.location.href='sacola.html'">
+    <i class="fas fa-shopping-bag"></i> Sacola
+  </button>
+  <h1>Catálogo de Produtos</h1>
+  <div id="catalogue"></div>
+
+  <script>
+    const families = [
+      { title: 'ANILHA SPORT PINTADA', img: 'images/ANILHA_SPORT_PINTADA.jpg', price: 10.00, weights: [1,2,3,4,5,10,15,20,25] },
+      { title: 'ANILHA SPORT EMBORRACHADA', img: 'images/ANILHA_SPORT_EMBORRACHADA.jpg', price: 12.00, weights: [1,2,3,4,5,10,15,20,25] },
+      { title: 'ANILHA VAZADA EMBORRACHADA', img: 'images/ANILHA_VAZADA_EMBORRACHADA.jpg', price: 12.00, weights: [1,2,3,4,5,10,15,20,25] },
+      { title: 'ANILHA VAZADA PINTADA', img: 'images/ANILHA_VAZADA_PINTADA.jpg', price: 12.00, weights: [1,2,3,4,5,10,15,20,25] },
+      { title: 'KETTLEBELL PINTADO', img: 'images/KETTLEBELL_PINTADO.jpg', price: 15.00, weights: [4,6,8,10,12,14,16,18,20,22,24] },
+      { title: 'KETTLEBELL EMBORRACHADO', img: 'images/KETTLEBELL_EMBORRACHADO.jpg', price: 18.00, weights: [4,6,8,10,12,14,16,18,20,22,24] },
+      { title: 'KETTLEBELL EMBORRACHADO PEGADA PINTADA', img: 'images/KETTLEBELL_EMBORRACHADO_PEGADA_PINTADA.jpg', price: 20.00, weights: [4,6,8,10,12,14,16,18,20,22,24] },
+      { title: 'TIJOLINHO 5KG', img: 'images/TIJOLINHO_5KG.jpg', price: 8.00, weights: [5] }
+    ];
+
+    const container = document.getElementById('catalogue');
+    families.forEach(fam => {
+      const section = document.createElement('div');
+      section.className = 'family-section';
+      let html = `
+        <div class="family-title">${fam.title}</div>
+        <div class="family-layout">
+          <div class="family-image">
+            <img src="${fam.img}" alt="${fam.title}">
+          </div>
+          <div class="family-list">
+            <table>
+              <thead>
+                <tr><th>Produto</th><th>Preço</th><th>Qtd</th><th></th></tr>
+              </thead>
+              <tbody>
+      `;
+      fam.weights.forEach(w => {
+        html += `
+                <tr>
+                  <td>${fam.title} ${w} KG</td>
+                  <td>R$${fam.price.toFixed(2)}</td>
+                  <td><input type="number" min="0" value="0"></td>
+                  <td><button class="add-to-cart" onclick="toggleCart(this, '${fam.title} ${w} KG', ${fam.price})"><i class="fas fa-shopping-bag"></i></button></td>
+                </tr>
+        `;
+      });
+      html += `
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+      section.innerHTML = html;
+      container.appendChild(section);
+    });
+
+    function toggleCart(btn, name, price) {
+      const row = btn.closest('tr');
+      const input = row.querySelector('input');
+      const qty = parseInt(input.value) || 0;
+      if (qty <= 0) {
+        return alert('Selecione uma quantidade válida');
+      }
+      let cart = JSON.parse(localStorage.getItem('cart')) || [];
+      const idx = cart.findIndex(i => i.name === name);
+      if (idx >= 0) {
+        cart[idx].qty += qty;
+      } else {
+        cart.push({ name, price, qty });
+      }
+      localStorage.setItem('cart', JSON.stringify(cart));
+      btn.classList.add('added');
+      alert(`${name} x${qty} adicionado ao carrinho`);
+    }
+  </script>
+</body>
+</html>
